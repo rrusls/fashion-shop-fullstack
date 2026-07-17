@@ -27,10 +27,10 @@ For me, this is a huge jump from konwing basic JS from college to learning and i
 ## Install
 1. **Clone the repository.** Use your cmd and perform next operation: 
 
-  ```bash
-  git clone https://github.com/rrusls/fashion-shop-fullstack.git
-  cd fashion-shop-fullstack
-  ```
+    ```bash
+    git clone https://github.com/rrusls/fashion-shop-fullstack.git
+    cd fashion-shop-fullstack
+    ```
 2. **Create and activate a virtual environment.** This keeps project dependencies isolated from your global Python install.
    ```bash
      python -m venv venv
@@ -44,21 +44,21 @@ For me, this is a huge jump from konwing basic JS from college to learning and i
    ```
    You will see `(venv)` in terminal prompt after it's successful activation.
 
-4. **Install Python dependencies.** Make sure your Python version is fresh and pip works normally.
+3. **Install Python dependencies.** Make sure your Python version is fresh and pip works normally.
 
-  ```bash
-     pip install -r requirements.txt
-  ```
+     ```bash
+       pip install -r requirements.txt
+    ```
 4. **Start the FastAPI server**. Start the server to connect frontend and backend.
    
-  ```bash
-  uvicorn main:app --reload
-  ```
-  The **backend** will be available at:
+    ```bash
+    uvicorn main:app --reload
+    ```
+    The **backend** will be available at:
 
-  ```
-  http://127.0.0.1:8000
-  ```
+    ```
+    http://127.0.0.1:8000
+    ```
  5. **Open `fashion-shop.html` in your browser.** See fashion shop on your screen.
   The application will automatically connect to the running backend and use the included SQLite database (`mara.db`).
   
