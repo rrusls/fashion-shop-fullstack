@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Shop Prototype (User oriented) </title>
+    <style>
+        body {
+            font-family:Arial, Helvetica, sans-serif;
+            margin: 0;
+            color: black;
+            background-color: white;
+            padding: 0 16px;
+        }  
+        .img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        } 
+        header button {
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+            top: 14px;
+            right: 10px;
+            width:100px;
+        }
+        header button:hover{
+            background:rgb(123, 249, 34);
+            color: black;
+        }
+        h1 {
+            font-size:21px;
+            padding: 8px;
+            align-items: center;
+            display: flex;
+            border-bottom: 2px solid black;
+        }
+        h2 {
+            font-size: 17px;
+            padding: 8px;
+            align-items:justify;
+        }
+        /* buttons 'All, Clothes, Shoes' and search engine in .menu  */
+        .menu {
+            flex-wrap: wrap;
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .menu button {
+            height:40px;
+            width: auto;
+            padding: 6px 10px;
+            margin-left:5px;
+            text-align: center;
+            background-color: white;
+            display: inline-block;
+            font-size:14px;
+            color: black;
+            cursor: pointer;
+        }
+
+        .menu button.active {
+            background: #222;
+            color: #fff;
+            border-color: #222;
+        }
+        .menu .search {
+            padding: 6px 10px;
+            font-size: 20px;
+            border: 1px solid black; 
+        }
+        .menu .search input {
+            font-size:14px;
+            width: 200px;
+        }
+        /* catalogue grid */
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        /* item card with control buttons (size selection, 'add to cart') */
+       .item {
+            width: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display:inline-block;
+        }
+        .image-placeholder {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .price h3 {
+            margin: 5px 0 15px 0;
+            font-size: 18px;
+        }
+
+        .control_buttons {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 15px;
+            width:100%;
+        }
+        .size_choice {
+            flex:1;
+        }
+        .size_choice select {
+            width: 250px;
+            height:40px;
+        }
+        
+        .control_buttons button {
+            flex:1;
+            width:140%;
+            height:30px;
+            
+            padding: 6px 10px;
+            text-align: center;
+            background-color: black;
+            display: inline-block;
+            font-size:14px;
+            color: white;
+            cursor: pointer;
+        }
+        .control_buttons button:hover {
+            background:rgb(123, 249, 34);
+            color: black;
+        }
+        select,option{
+            width:100px;
+            height:20px;
+            font-size:16px;
+        }
+        #cartPanel {
+            display: none;
+            position: fixed;
+            height:100%;
+            width:300px;
+            top: 0px;
+            right: 0;
+            background: rgb(245, 244, 244);
+            border: 1px solid black;
+        }
+        #cartTitle {
+            position:fixed;
+            margin: 10px;
+            top: 2px;
+            font-weight: 500;
+            font-size:14px;
+        }
+        #cartPanel #closeCart {
+            background: white;
+            border: none;
+            position: absolute;
+            font-weight:bolder;
+            color: red;
+            top: 0px;
+            right:10px;
+        }
+        #cartPanel catalogue {
+            position:absolute;
+            top:5px;
+        }
+        #emptyMessage { color: #888; font-size: 14px; }
+        .cart-row {
+            display: flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .cart-total {
+            font-weight: bold;
+            margin-top: 16px;
+        }
+        .remove-icon {
+            color: red;
+            cursor: pointer;
+            background: none;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MARA Fahsion Shop</h1>
+        <button id="cartTitle" onclick="toggleCartPanel()">Cart (<span id="cartItemAmount">0</span>)</button>
+    </header>
+    <div class="menu">
+        <div class="search">
+            <input type="search" id="searchInput" placeholder="Search anything you want...">
+        </div>
+        <div class="button">
+            <button class="menu-button active" data-category="all">All</button>
+            <button class="menu-button" data-category="clothes">Clothes</button>
+            <button class="menu-button" data-category="shoes">Shoes</button>
+        </div>
+    </div>
+
+    <div id="grid"></div>
+    <p id="emptySearchResult" style="display:none;">Nothing found. Yet..</p>
+    <!-- template for Item card (to use multiple times)-->
+    <template id="product-card-template">
+        <div class="item">
+            <div class="image-placeholder">
+                <img class="img" src="" alt="Item image">
+            </div>
+            <p class="product_name">Name</p>
+
+            <div class="price">
+                <h3>$0</h3>
+            </div>
+            <div class="control_buttons">
+                <div class="shoe_size">
+                    <select class="shoes_size" name="shoes_size"></select>
+                </div>
+                <div class="button">
+                    <button class="add_to_cart_button">Add</button>
+                </div>
+            </div>
+        </div>
+    </template>
+    <div id="cartPanel" style="display:none;">
+        <p>Cart</p>
+        <p id="emptyMessage">Empty cart</p>
+        <div id="catalogue"></div>
+        <p class="cart-total">Total: <span id="totalAmount">0</span>$</p>
+        <button id="closeCart" onclick="toggleCartPanel()">✕</button>
+    </div>
+    <!-- all javascript scripts -->
+    <script>
+        let products = [];
+        let cart = [];
+        async function loadProducts() {
+            const response = await fetch("http://127.0.0.1:8000/items/all");
+            products = await response.json();
+            renderProducts(products);
+        }
+        async function loadProductsByCategory(category) {
+            const response = await fetch(`http://127.0.0.1:8000/items/${category}`);
+            products = await response.json();
+            renderProducts(products);
+        }
+        function searchEngine() {
+            const searchText = searchInput.value.toLowerCase();
+            const items = document.querySelectorAll(".item"); // getting list of values from items
+            let foundCount = 0;
+            for (let i=0; i<items.length;i++) {
+                const item = items[i];
+                const itemName = item.querySelector(".product_name").textContent.toLowerCase();
+
+                const searchMatch = itemName.includes(searchText);
+
+                if (searchMatch) {
+                    foundCount = foundCount + 1;
+                    item.style.display = "inline-block";
+                }
+                else {
+                    item.style.display = "none";
+                    emptySearchResult = document.getElementById("emptySearchResult");
+                    emptySearchResult.textContent = "Nothing found. Not for long";
+                }
+            }
+            if (foundCount===0) {
+                emptySearchResult.style.display = "block";
+            }
+            else {
+                emptySearchResult.style.display = "none";
+            }
+        
+        }   
+    
+        async function loadCart() { // load cart 
+            const response = await fetch("http://127.0.0.1:8000/cart");
+            cart = await response.json();
+            renderCart();
+            updateTotalSum();
+            renderCartItemAmount();
+        }
+        async function addToCart(product,size) { // adding to the cart
+            await fetch("http://127.0.0.1:8000/cart", {method: "POST", headers: {"Content-Type" : "application/json"}, body: JSON.stringify({item_id: product.id, size: size, amount: 1})
+            }); // stringify used to convert a string to avoid working with unallowed json format
+            await loadCart();
+        }
+        async function removeFromCart(cartItemId) { // removing from the cart
+            await fetch(`http://127.0.0.1:8000/cart/${cartItemId}`, {
+                method: "DELETE"
+            });
+            await loadCart();
+            renderCartItemAmount();
+        }
+        
+        function renderCart(){ // showing the cart 
+            let catalogue = document.getElementById("catalogue");
+            let emptyMessage = document.getElementById("emptyMessage"); 
+            catalogue.innerHTML = "";
+
+            if (cart.length === 0) {
+                emptyMessage.style.display = "block";
+            }
+            else {
+                emptyMessage.style.display = "none";
+            }
+            for (let i=0; i<cart.length;i++){
+                let item = cart[i];
+                catalogue.innerHTML += `<div class="cart-row">
+                                            <p>${item.name} (${item.size}) x${item.amount}</p>
+                                            <button class="remove-icon" onclick="removeFromCart(${item.id})">✕</button>
+                                        </div>
+                                        `; //template-like mechanism (not used template because of shortness of a cart-row structure)
+            }
+        }
+        function updateTotalSum () { //updating total sum
+            let total = 0;
+
+            for (let i =0; i < cart.length; i++) {
+                cart_item = cart[i]
+                total = total + cart_item.price * cart_item.amount;
+            }
+            document.getElementById("totalAmount").textContent = total;
+        } 
+
+        function renderCartItemAmount() {
+            totalCartItemAmount = cart.length;
+            document.getElementById("cartItemAmount").textContent = totalCartItemAmount;
+        }
+        async function renderProducts(products) { // showing products
+           const grid = document.querySelector('#grid'); 
+           grid.innerHTML = "";     // re-creating grid everytime we render catalogue
+           const template = document.getElementById('product-card-template'); // getting the card template to work with
+
+            for (let i=0; i < products.length; i++) {
+                const product = products[i];
+                const clone = template.content.cloneNode(true); // cloning and multiplying as in the template
+                
+                const itemCard = clone.querySelector('.item'); // below - setting category, img, name, price to corresponding data categories and classes (.img, .price, etc.)
+                itemCard.setAttribute('data-category', product.category) 
+                clone.querySelector('.img').src = product.img; 
+                clone.querySelector('.product_name').textContent = product.name;
+                clone.querySelector('.price h3').textContent = "$" + product.price;
+                
+
+                const sizeSelect = clone.querySelector(".shoes_size"); // clonning a selector of size based on what type of product we have (36,40,44 for shoes, XS,S,M for clothes)
+                const response_sizes = await fetch(`http://127.0.0.1:8000/items/${product.id}/sizes`); //backend request
+                const sizes = await response_sizes.json(); // list of strings 
+                for (let j = 0; j < sizes.length; j++) {
+                    const size = sizes[j];
+                    const option = document.createElement("option");
+                    option.value = size;
+                    option.textContent = size;
+                    sizeSelect.appendChild(option);
+                }
+                
+                clone.querySelector('.add_to_cart_button').addEventListener('click', function() { //adding the eventlistener to listen to user's click
+                    const selectedSize = sizeSelect.value;
+                    addToCart(product, selectedSize);
+                });
+                grid.appendChild(clone);
+            }
+        }
+
+        const buttons = document.querySelectorAll(".menu-button");
+        for (let i=0; i < buttons.length; i++) {
+            let current_button = buttons[i];
+            current_button.addEventListener("click", changeCategoryClick); // adding event listener to all the buttons
+        }
+        
+        function changeCategoryClick(event) { // adds 'active' to a button which user has pressed
+            let clickedButton = event.currentTarget;
+            
+            for (let i = 0; i < buttons.length; i++) {
+                button = buttons[i];
+                button.classList.remove("active");
+            }
+            clickedButton.classList.add("active");
+
+            const category = clickedButton.getAttribute("data-category").toLowerCase();
+            loadProductsByCategory(category);
+        }
+        function toggleCartPanel() { // changing if we show cart panel or hide
+            let cartPanel = document.getElementById("cartPanel");
+            if (cartPanel.style.display === 'none') { //if style is none, then it's hidden, so show it because button 'Cart' was pressed
+                cartPanel.style.display = 'block'; //none -> block
+            }
+            else { // if cart panel is already showing, then button means need to hide it, so hide it
+                cartPanel.style.display = 'none';
+            }
+        }
+        loadProducts();
+        loadCart();
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", searchEngine);
+    </script>
+
+
+</body>
+</html>
