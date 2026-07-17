@@ -9,7 +9,7 @@ work with database, allowing it directly from the code without writing raw SQL q
 The application (if you can call it that) supports searching through the catalogue via search engine, category filtering and a shopping cart.
 A catalogue and shopping cart functions (i.e product data) is retrieved from the backend to provide code safety and improve overall project logic.
 
-For me, this is a huge jump from konwing basic JS from college to learning and instantly implementing them in real projects, as well as getting experience in working 
+For me, this is a huge jump from konwing basic JS from college to learning and instantly implementing new functions and JS opportunities in real projects, as well as getting experience in working 
 with SQL commands in Python.
 
 ## Features
